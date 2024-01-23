@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+"""
+MD Simulation Fingerprint Models.
+
+@author: Benjamin Shields 
+@email: benjamin.shields@bms.com
+"""
+
+############################################################################## Imports
+
+import logging
+import os
+import pandas as pd
+
+from mdml import model, cli, plot
+
+############################################################################## Methods
+
+logger = logging.getLogger(__name__)
+
+MODELS = {
+    'linear':model.LinearRegression,
+    'ridge':model.RidgeRegression,
+    'lasso':model.LassoRegression,
+    'random_forest':model.RandomForestRegression,
+    'gradient_boosting':model.GradientBoostingRegression
+}
+
+############################################################################## Setup
+
+def get_parser():
+    description = """Train regression models and evaluate performance using
+    nested cross-validation."""
+    parser, groups = cli.parser(description, add_computation=True)
+    
+    # Input/Output Data
+    data = parser.add_argument_group("DATA")
+    data.add_argument(
+        'input',
+        help="Path to CSV containing features, IDs, and target (optional)."
+    )
+    data.add_argument(
+        'output',
+        help="Directory path to save output files."
+    )
+    data.add_argument(
+        '-target_col',
+        type=str,
+        default=None,
+        help="Header of target column in training data CSV.",
+        required=True
+    )
+    data.add_argument(
+        '-id_col',
+        type=str,
+        default=None,
+        help="Header of compound ID column.",
+        required=True
+    )
+    data.add_argument(
+        '-drop_col',
+        nargs='+',
+        type=str,
+        default=[],
+        help="Columns that should be removed from the training CSV."
+    )
+    data.add_argument(
+        '-group',
+        type=str,
+        default=None,
+        help="""Grouping method. The options include 'mean', 'min', and 'max'. 
+        Data will be grouped by compound ID (id_col)."""
+    )
+    
+    # Model Details
+    model = parser.add_argument_group("MODEL")
+    model.add_argument(
+        '-model_type',
+        type=str,
+        default='linear',
+        help="""Regression model type. The options are 'linear', 'ridge', 'lasso', 
+        'random_forest', and 'gradient_boosting'."""
+    )
+    model.add_argument(
+        '-cv',
+        type=int,
+        default=-1,
+        help="""Number of cross-validation folds to use in hyperparameter 
+        tuning. Specify -1 for leave-one-out."""
+    )
+    model.add_argument(
+        '-lofo',
+        action='store_true',
+        help="""Run leave-one-feature-out cross-validation analysis."""
+    )
+    model.add_argument(
+        '-nested',
+        dest='nested',
+        action='store_false',
+        help="""Toggle nested cross-validation. Hyperparamters will NOT be
+        optimized in each fold."""
+    )
+    
+    return parser
+
+############################################################################## Main
+
+def run(args):
+    # Details
+    logger.debug(f'Workflow set to nested={args.nested}')
+    
+    # Load and preprocess data
+    logger.debug(f'Loading data: {args.input}')
+    data = cli.load_data(
+        args.input, args.id_col, drop=args.drop_col, aggregation=args.group
+    )
+    logger.debug(f'Dataset contains {len(data)} entries')
+    
+    # Output directory
+    if not os.path.isdir(args.output):
+        os.mkdir(args.output)
+    
+    # Build and fit model
+    logger.debug('Building initial model')
+    workflow = MODELS[args.model_type](data, args.target_col)
+    workflow.fit(n_jobs=args.nproc, cv=args.cv)
+    imp = workflow.feature_importance()
+    
+    # Save model
+    path = os.path.join(args.output, 'model.pkl')
+    logger.debug(f'Saving model to {path}')
+    workflow.__save__(path)
+    path = os.path.join(args.output, 'importance.csv')
+    logger.debug(f'Saving feature importance to {path}')
+    imp.to_csv(path)
+    
+    # Run (possibly nested) cross-validation
+    logger.debug('Running cross-validation')
+    cv = workflow.cross_validate(
+        nested=args.nested, cv=args.cv, n_jobs=args.nproc
+    )
+    path = os.path.join(args.output, 'cross_validation')
+    logger.debug(
+        f'Saving cross-validation results to {path}.json and {path}.svg'
+    )
+    cli.save_json(cv, f'{path}.json')
+    cv_df = pd.DataFrame()
+    cv_df['ID'] = cv['ids']
+    cv_df['pred'] = cv['pred']
+    cv_df['obs'] = cv['obs']
+    cv_df = cv_df.groupby('ID').mean()
+    plot.parity_plot(
+        cv_df['pred'], cv_df['obs'], title='Cross-Validation', cod='Q^2',
+        export_path=path
+    )
+    
+    # Run leave-one-feature-out CV
+    if args.lofo:
+        logger.debug('Running leave-one-feature-out cross-validation')
+        lofo = model.leave_one_feature_out_importance(
+            workflow, nested=args.nested, cv=args.cv, n_jobs=args.nproc
+        )
+        path = os.path.join(args.output, 'lofo_cross_validation.json')
+        logger.debug(
+            f'Saving lofo cross-validation results to {path}'
+        )
+        cli.save_json(lofo, f'{path}.json')
+
+
+if __name__ == "__main__":
+    parser = get_parser()
+    args = parser.parse_args()
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    run(args)
+
+

@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: mdml
+Version: 0.1.0
+Summary: Simulation Fingerprint Machine Learning Models.
+Author: Benjamin J. Shields
+Author-email: benjamin.shields@bms.com
+Keywords: MD,Machine Learning
+Classifier: Development Status  3 - Alpha
+Classifier: Intended Audience  ScienceResearch
+Classifier: Topic  ScientificEngineering  Chemistry
+Classifier: Programming Language  Python  3

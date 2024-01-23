@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ "x$_CE_CONDA" = "x" ]
+then
+    . /ap/conda_rh7/etc/profile.d/conda.sh
+fi
+if [ "$CONDA_DEFAULT_ENV" != "molbo" ]
+then
+    conda activate molbo
+fi
+
+export PYTHONNOUSERSITE=True
+
+mdml_train "$@"

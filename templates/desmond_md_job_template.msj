@@ -1,0 +1,116 @@
+# Desmond standard NPT relaxation protocol
+# All times are in the unit of ps.
+# Energy is in the unit of kcal/mol.
+task {
+   task = "desmond:auto"
+   set_family = {
+      desmond = {
+         checkpt.write_last_step = no
+      }
+   }
+}
+
+simulate {
+   title       = "Brownian Dynamics NVT, T = 10 K, small timesteps, and restraints on solute heavy atoms, 100ps"
+   annealing   = off
+   time        = 100
+   timestep    = [0.001 0.001 0.003 ]
+   temperature = 10.0
+   ensemble = {
+      class = "NVT"
+      method = "Brownie"
+      brownie = {
+         delta_max = 0.1
+      }
+   }
+   restrain = {
+      atom = "solute_heavy_atom"
+      force_constant = 50.0
+   }
+}
+
+simulate {
+   effect_if   = [["==" "-gpu" "@*.*.jlaunch_opt[-1]"] 'ensemble.method = Langevin']
+   title       = "NVT, T = 10 K, small timesteps, and restraints on solute heavy atoms, 12ps"
+   annealing   = off
+   time        = 12
+   timestep    = [0.001 0.001 0.003]
+   temperature = 10.0
+   restrain    = { atom = solute_heavy_atom force_constant = 50.0 }
+   ensemble    = {
+      class  = NVT
+      method = Berendsen
+      thermostat.tau = 0.1
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+simulate {
+   title       = "NPT, T = 10 K, and restraints on solute heavy atoms, 12ps"
+   effect_if   = [["==" "-gpu" "@*.*.jlaunch_opt[-1]"] 'ensemble.method = Langevin']
+   annealing   = off
+   time        = 12
+   temperature = 10.0
+   restrain    = retain
+   ensemble    = {
+      class  = NPT
+      method = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 50.0
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+solvate_pocket {
+   should_skip = true
+   ligand_file = ?
+}
+
+simulate {
+   title       = "NPT and restraints on solute heavy atoms, 12ps"
+   effect_if   = [["@*.*.annealing"] 'annealing = off temperature = "@*.*.temperature[0][0]"'
+                  ["==" "-gpu" "@*.*.jlaunch_opt[-1]"] 'ensemble.method = Langevin']
+   time        = 12
+   restrain    = retain
+   ensemble    = {
+      class  = NPT
+      method = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 50.0
+   }
+
+   randomize_velocity.interval = 1.0
+   eneseq.interval             = 0.3
+   trajectory.center           = []
+}
+
+simulate {
+   title       = "NPT and no restraints, 24ps"
+   effect_if   = [["@*.*.annealing"] 'annealing = off temperature = "@*.*.temperature[0][0]"'
+                  ["==" "-gpu" "@*.*.jlaunch_opt[-1]"] 'ensemble.method = Langevin']
+   time        = 24
+   ensemble    = {
+      class  = NPT
+      method = Berendsen
+      thermostat.tau = 0.1
+      barostat  .tau = 2.0
+   }
+
+   eneseq.interval   = 0.3
+   trajectory.center = solute
+}
+
+simulate {
+   cfg_file = "CONFIG_NAME"
+   jobname  = "$MASTERJOBNAME"
+   dir      = "."
+   compress = ""
+}
+
+pl_analysis {}

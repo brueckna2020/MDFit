@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""
+Add polynomial features
+
+@author: Benjamin Shields 
+@email: benjamin.shields@bms.com
+"""
+
+
+import pandas as pd
+from mdml import cli
+from sklearn.preprocessing import PolynomialFeatures
+
+def get_parser():
+    description = """Add polynomial features to a SimFP output CSV."""
+    parser, groups = cli.parser(description)
+    opts = parser.add_argument_group("OPTIONS")
+    opts.add_argument(
+        '-target_col',
+        type=str,
+        default=None,
+        help="Name of target column in training data CSV.",
+    )
+    opts.add_argument(
+        '-drop_col',
+        nargs='+',
+        type=str,
+        default=[],
+        help="Columns that should be removed from the training CSV."
+    )
+    required = parser.add_argument_group("REQUIRED")
+    required.add_argument(
+        'input',
+        help="Path to CSV containing features, IDs, and target (optional).",
+    )
+    required.add_argument(
+        'output',
+        help="Path to save output CSV.",
+    )
+    required.add_argument(
+        '-id_col',
+        type=str,
+        required=True,
+        help="Name of compound ID column.",
+    )
+    
+    return parser
+
+def main(args):
+    data = cli.load_data(args.input, args.id_col, drop=args.drop_col)
+    drop = ['ID']
+    if args.target_col is not None:
+        drop.append(args.target_col)
+    X = data.copy().drop(drop, axis=1)
+    poly = PolynomialFeatures(
+        degree=2, 
+        include_bias=False, 
+        interaction_only=False
+    )
+    X = pd.DataFrame(
+        poly.fit_transform(X),
+        columns=poly.get_feature_names_out(),
+        index=data.index
+    )
+    if args.target_col is not None:
+        X[args.target_col] = data[args.target_col]
+    X.insert(0, args.id_col, data['ID'].values)
+    X.to_csv(args.output, index=False)
+
+if __name__ == "__main__":
+    parser = get_parser()
+    args = parser.parse_args()
+    main(args)
+

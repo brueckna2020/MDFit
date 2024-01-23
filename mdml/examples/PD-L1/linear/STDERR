@@ -1,0 +1,9 @@
+DEBUG:__main__:Workflow set to nested=True
+DEBUG:__main__:Loading data: data.csv
+DEBUG:__main__:Dataset contains 183 entries
+DEBUG:__main__:Building initial model
+DEBUG:__main__:Saving model to linear/model.pkl
+DEBUG:__main__:Saving feature importance to linear/importance.csv
+DEBUG:__main__:Running cross-validation
+Molecule CV: 0it [00:00, ?it/s]Molecule CV: 1it [00:00,  5.50it/s]Molecule CV: 2it [00:00,  5.62it/s]Molecule CV: 4it [00:00,  9.64it/s]Molecule CV: 6it [00:00, 12.63it/s]Molecule CV: 9it [00:00, 13.57it/s]Molecule CV: 11it [00:01, 10.67it/s]Molecule CV: 13it [00:01, 12.44it/s]Molecule CV: 19it [00:01, 21.93it/s]Molecule CV: 22it [00:01, 22.04it/s]Molecule CV: 28it [00:01, 30.90it/s]Molecule CV: 36it [00:01, 37.93it/s]Molecule CV: 43it [00:01, 45.15it/s]Molecule CV: 48it [00:01, 39.26it/s]Molecule CV: 53it [00:02, 36.20it/s]Molecule CV: 57it [00:02, 32.07it/s]Molecule CV: 61it [00:02, 25.82it/s]
+DEBUG:__main__:Saving cross-validation results to linear/cross_validation.json and linear/cross_validation.svg

@@ -1,0 +1,18 @@
+task {
+  task = "desmond:auto"
+}
+
+build_geometry {
+  box = {
+     shape = orthorhombic
+     size = [10.0 10.0 10.0]
+     size_type = buffer
+  }
+  rezero_system = true
+  solvent = <solvent>
+}
+
+assign_forcefield {
+  forcefield = OPLS4
+  water = <solvent>
+}
