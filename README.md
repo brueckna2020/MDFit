@@ -27,7 +27,6 @@ $SCHRODINGER/run python3 MDFit.py -p 6PV9_PDL1.mae -l MDFit_PDL1_Example_Ligands
 ```
 It is strongly encouraged to use the debug flag `-d` for initial MDFit usage. Errors may occur if packages are not where MDFit expects them to be.
 
-![PDL1_Peptide_Examples](https://scsgit.rdcloud.bms.com/storage/user/63/files/984aa7be-0c45-40ea-862a-83da3becf350)
-**Figure 1.** Starting conformations for PD-L1=grey; Pep-01=green; Pep-41=cyan; Pep-52=purple; Pep-66=yellow. PD-L1 is contained in the `6PV9_PDL1.mae` file and the peptides are contained in the `MDFit_PDL1_Example_Ligands.mae` file.
+
 # Bugs and Known Errors
 + Schrodinger release relying on installation pathname.
