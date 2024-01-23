@@ -11,11 +11,11 @@ MDFit attempts to get the current Schrodinger release by reading the `$SCHRODING
 
 The first time MDFit.py is called, a `parameters_TEMPLATE.json` file is generated in the installation directory. Replace `localhost` with your institution's Schrodinger hostnames and rename the file to `parameters.json`. This is required only once and MDFit will always read `parameters.json` to get host information on subsequent runs. General runtime limit guidance:
 ```
-FFBUILDER   7 days
-BMIN        12 hours
-MULTISIM    12 hours
-DESMOND     3 days
-ANALYSIS    3 days
+FFBUILDER   10 hours
+BMIN        2 hours
+MULTISIM    2 hours
+DESMOND     24 hours
+ANALYSIS    8 hours
 ```
 # Usage
 ```
