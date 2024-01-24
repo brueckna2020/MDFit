@@ -6,7 +6,7 @@ Machine learning models for analyzing MD simulation fingerprints.
 
 ```
 git clone git@github.com:brueckna2020/MDFit.git
-cd mdml
+cd MDFit/mdml
 pip install -e .
 ```
 
