@@ -1,6 +1,6 @@
 # MDFit
-Python wrapper for high-throughput molecular dynamics. A workflow overview and application of MDFit to a data set of macrocyclic peptides targetting PD-L1 are discussed in _TBD_.[^1]
-[^1]: Reference TBD
+Python wrapper for high-throughput molecular dynamics. A workflow overview and application of MDFit to a data set of macrocyclic peptides targetting PD-L1 are discussed in _ChemRxiv_.[^1]
+[^1]: [MDFit: Automated molecular simulations workflow enables high throughput assessment of ligands-protein dynamics](https://doi.org/10.26434/chemrxiv-2024-gfcqx)
 
 MDFit currently uses Schrodinger tools. Implementation of alternatives, including open-source tools, are ongoing.
 # Prerequisites
