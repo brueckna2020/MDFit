@@ -1,7 +1,7 @@
 # MDML
 
 Train machine learning models to predict potency from SimFPs and automatically identify
-import interactions via feature importance.
+important interactions via feature importance.
 
 ## Installation
 
