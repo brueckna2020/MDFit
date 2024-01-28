@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-MD Simulation Fingerprint Models.
+Train MD Simulation Fingerprint Models
+--------------------------------------
+Train simulation fingerprint models, evaluate performance via nested leave-one
+-molecule-out cross-validation, and identify important interactions via 
+feature importance.
 
 @author: Benjamin Shields 
 @email: benjamin.shields@bms.com
@@ -14,7 +18,7 @@ import pandas as pd
 
 from mdml import model, cli, plot
 
-############################################################################## Methods
+############################################################################## Setup
 
 logger = logging.getLogger(__name__)
 
@@ -26,18 +30,19 @@ MODELS = {
     'gradient_boosting':model.GradientBoostingRegression
 }
 
-############################################################################## Setup
+############################################################################## Interface
 
 def get_parser():
-    description = """Train regression models and evaluate performance using
-    nested cross-validation."""
+    description = """Train regression models, evaluate performance using
+    nested leave-one-molecule-out cross-validation, and identify important
+    interactions via feature importance."""
     parser, groups = cli.parser(description, add_computation=True)
     
     # Input/Output Data
     data = parser.add_argument_group("DATA")
     data.add_argument(
         'input',
-        help="Path to CSV containing features, IDs, and target (optional)."
+        help="Path to CSV containing SimFP features, IDs, and target (optional)."
     )
     data.add_argument(
         'output',
@@ -105,7 +110,7 @@ def get_parser():
 
 ############################################################################## Main
 
-def run(args):
+def main(args):
     # Details
     logger.debug(f'Workflow set to nested={args.nested}')
     
@@ -172,6 +177,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
-    run(args)
-
+    main(args)
 

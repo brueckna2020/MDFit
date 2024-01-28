@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Basic Plotting
---------------
+Plotting Methods
+----------------
 Generate basic plots for MDML analysis.
 
 @author: Benjamin Shields 

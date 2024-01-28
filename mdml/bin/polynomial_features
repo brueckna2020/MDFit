@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 """
-Add polynomial features
+Polynomial Features
+-------------------
+A helper script to include include squared and interaction terms (polynomial
+features) to SimFPs.
 
 @author: Benjamin Shields 
 @email: benjamin.shields@bms.com
 """
 
+############################################################################## Imports
 
 import pandas as pd
 from mdml import cli
 from sklearn.preprocessing import PolynomialFeatures
+
+############################################################################## Interface
 
 def get_parser():
     description = """Add polynomial features to a SimFP output CSV."""
@@ -46,6 +52,8 @@ def get_parser():
     
     return parser
 
+############################################################################## Main
+
 def main(args):
     data = cli.load_data(args.input, args.id_col, drop=args.drop_col)
     drop = ['ID']
@@ -66,6 +74,7 @@ def main(args):
         X[args.target_col] = data[args.target_col]
     X.insert(0, args.id_col, data['ID'].values)
     X.to_csv(args.output, index=False)
+
 
 if __name__ == "__main__":
     parser = get_parser()
