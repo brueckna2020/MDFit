@@ -526,6 +526,8 @@ def load_workflow(path:str) -> BaseWorkflow:
 
     # Loader class
     class PredictWorkflow(BaseWorkflow):
+        def _feature_importance(self) -> None:
+            return None
         def feature_importance(self) -> None:
             return None
 
